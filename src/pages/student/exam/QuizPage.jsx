@@ -19,7 +19,6 @@ const QuizPage = () => {
   useEffect(() => {
     if (currentQuestionIndex >= mockQuestions.length) {
       setIsFinished(true);
-      calculateScore();
     }
   }, [currentQuestionIndex]);
 
@@ -48,6 +47,7 @@ const QuizPage = () => {
       }
     });
     setScore(totalScore);
+    console.log("Tổng điểm1: ", score);
     updateLeaderboard(totalScore);
   };
 
@@ -104,9 +104,11 @@ const QuizPage = () => {
 
     if (isCorrect) {
 
-      let timeFactor = Math.max(0, (30 - timeQuestion) / 30); // tính tỷ lệ thời gian còn lại (tối đa 1)
-      let questionScore = 1000 * timeFactor; // tối đa 1000 điểm
-      setScore((prev) => prev + Math.round(questionScore)); // cộng điểm cho câu trả lời đúng
+      let timeFactor = Math.max(0, (15 - timeQuestion) / 15);
+      let questionScore = 1000 * timeFactor;
+      setScore((prev) => prev + Math.round(questionScore));
+      console.log("Đúng! Điểm cộng: ", Math.round(questionScore));
+      console.log("Tổng điểm", score)
     }
   };
 
