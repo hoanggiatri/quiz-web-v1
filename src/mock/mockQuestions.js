@@ -5,10 +5,10 @@ const mockQuestions = [
     category: "Frontend",
     type: "multiple", // nhiều đáp án đúng
     answers: [
-      { id: 1, label: "A", answerText: "HTML", isCorrect: true },
-      { id: 2, label: "B", answerText: "CSS", isCorrect: true },
-      { id: 3, label: "C", answerText: "Java", isCorrect: false },
-      { id: 4, label: "D", answerText: "JavaScript", isCorrect: true }
+      { id: 1, answerText: "HTML", isCorrect: true },
+      { id: 2, answerText: "CSS", isCorrect: true },
+      { id: 3, answerText: "Java", isCorrect: false },
+      { id: 4, answerText: "JavaScript", isCorrect: true }
     ]
   },
   {
@@ -17,10 +17,10 @@ const mockQuestions = [
     category: "ReactJS",
     type: "single", // chỉ 1 đáp án đúng
     answers: [
-      { id: 5, label: "A", answerText: "React là một framework", isCorrect: false },
-      { id: 6, label: "B", answerText: "React dùng để tạo backend", isCorrect: false },
-      { id: 7, label: "C", answerText: "React là thư viện JavaScript", isCorrect: true },
-      { id: 8, label: "D", answerText: "React được tạo bởi Microsoft", isCorrect: false }
+      { id: 5, answerText: "React là một framework", isCorrect: false },
+      { id: 6, answerText: "React dùng để tạo backend", isCorrect: false },
+      { id: 7, answerText: "React là thư viện JavaScript", isCorrect: true },
+      { id: 8, answerText: "React được tạo bởi Microsoft", isCorrect: false }
     ]
   },
   {
@@ -29,10 +29,10 @@ const mockQuestions = [
     category: "Database",
     type: "multiple",
     answers: [
-      { id: 9, label: "A", answerText: "PostgreSQL", isCorrect: true },
-      { id: 10, label: "B", answerText: "MongoDB", isCorrect: false },
-      { id: 11, label: "C", answerText: "MySQL", isCorrect: true },
-      { id: 12, label: "D", answerText: "SQLite", isCorrect: true }
+      { id: 9, answerText: "PostgreSQL", isCorrect: true },
+      { id: 10, answerText: "MongoDB", isCorrect: false },
+      { id: 11, answerText: "MySQL", isCorrect: true },
+      { id: 12, answerText: "SQLite", isCorrect: true }
     ]
   }
 ];
