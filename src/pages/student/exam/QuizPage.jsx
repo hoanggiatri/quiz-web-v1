@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import mockQuestions from "../../../mock/mockQuestions";
 import { CountdownCircleTimer } from "react-countdown-circle-timer";
 import "../../../styles/student/exam/QuizPage.css";
+import mockQuestions from '../../../mock/mockQuestions';
 
 // Hàm shuffle mảng (Fisher-Yates)
 const shuffleArray = (array) => {
@@ -60,7 +60,7 @@ const QuizPage = () => {
     const currentQuestion = questions[questionIndex];
     if (!currentQuestion) return;
 
-    if (currentQuestion.type === "single") {
+    if (currentQuestion.type === "singleChoice") {
       setSelectedAnswers((prev) => ({
         ...prev,
         [questionIndex]: [optionId],
@@ -89,10 +89,10 @@ const QuizPage = () => {
   };
 
   const checkAnswer = (timeQuestion) => {
-    const question = questions[currentQuestionIndex];
+    const question = mockQuestions[currentQuestionIndex];
     const selected = selectedAnswers[currentQuestionIndex] || [];
-    const correctAnswers = question.answers.filter((a) => a.isCorrect).map((a) => a.id);
-
+    const correctAnswers = question.answers.filter((a) => a.is_correct).map((a) => a.id);
+    
     const isCorrect =
       selected.length === correctAnswers.length &&
       selected.every((id) => correctAnswers.includes(id));
@@ -133,7 +133,7 @@ const QuizPage = () => {
   const currentQuestion = questions[currentQuestionIndex];
 
   return (
-    <div className="relative min-h-screen bg-gradient-to-br from-blue-100 to-purple-100 py-10 px-6">
+    <div className="relative min-h-screen bg-gray-100 py-10 px-6">
       <div className="max-w-7xl mx-auto flex gap-6">
         {/* Leaderboard */}
         <div className="w-1/4 bg-white rounded-2xl shadow-lg p-6 h-fit">
@@ -146,7 +146,7 @@ const QuizPage = () => {
         </div>
 
         {/* Quiz content */}
-        <div className="flex-1 bg-white rounded-2xl shadow-xl p-8 relative">
+        <div className="flex-1 bg-white rounded-2xl shadow-xl p-8 relative text-black">
           {/* Timer */}
           <div className="absolute top-4 right-4 w-14 h-14">
             <CountdownCircleTimer
@@ -160,7 +160,7 @@ const QuizPage = () => {
               strokeWidth={5}
             >
               {({ remainingTime }) => (
-                <span className="text-xs font-semibold text-blue-700">
+                <span className="text-xs font-semibold text-black">
                   {remainingTime}s
                 </span>
               )}
@@ -169,41 +169,37 @@ const QuizPage = () => {
 
           {!isFinished && currentQuestion ? (
             <>
-              <h1 className="text-3xl font-bold text-center text-blue-700 mb-6">
-                Quiz: {currentQuestion.category}
+              <h1 className="text-3xl font-bold text-center mb-6">
+                Quiz: {currentQuestion.category_id}
               </h1>
 
               <div className="mb-4 text-xl font-semibold">
                 Điểm hiện tại: <span className="text-green-600">{score}</span>
               </div>
 
-              <h2 className="text-xl font-semibold text-gray-800 mb-4">
-                {currentQuestion.questionText}
-              </h2>
+              <h2 className="text-xl font-semibold mb-4">{currentQuestion.content}</h2>
               <div className="space-y-3">
                 {currentQuestion.answers.map((answer) => (
-                  <label
-                    key={answer.id}
-                    htmlFor={`option-${answer.id}`}
-                    className={`flex items-center p-3 rounded-lg cursor-pointer transition
-                      ${showAnswer
-                        ? answer.isCorrect
-                          ? "bg-green-200"
-                          : selectedAnswers[currentQuestionIndex]?.includes(answer.id)
-                          ? "bg-red-200"
-                          : "bg-gray-100"
-                        : "bg-gray-100 hover:bg-blue-100"}`}
-                  >
+                  <div key={answer.id} className="flex items-center">
                     <input
-                      type={currentQuestion.type === "multiple" ? "checkbox" : "radio"}
-                      id={`option-${answer.id}`}
-                      className="mr-3 accent-blue-600"
-                      checked={selectedAnswers[currentQuestionIndex]?.includes(answer.id)}
+                      type={currentQuestion.type === "singleChoice" ? "radio" : "checkbox"}
+                      id={`question-${currentQuestionIndex}-answer-${answer.id}`}
+                      name={`question-${currentQuestionIndex}`}
+                      value={answer.id}
+                      checked={selectedAnswers[currentQuestionIndex]?.includes(answer.id) || false}
                       onChange={() => handleOptionChange(currentQuestionIndex, answer.id)}
                       disabled={isOptionDisabled || isSubmitted}
+                      className="mr-2"
                     />
-                    <span className="font-medium">{answer.answerText}</span>
-                  </label>
+                    <label
+                      htmlFor={`question-${currentQuestionIndex}-answer-${answer.id}`}
+                      className={`cursor-pointer text-lg ${
+                        showAnswer && answer.is_correct ? "text-green-600" : ""
+                      } ${showAnswer && !answer.is_correct ? "text-red-600" : ""}`}
+                    >
+                      {answer.content}
+                    </label>
+                  </div>
                 ))}
               </div>
 
@@ -218,7 +214,7 @@ const QuizPage = () => {
             </>
           ) : (
             <div className="text-center">
-              <h2 className="text-2xl font-bold text-gray-800 mb-4">Kết thúc!</h2>
+              <h2 className="text-2xl font-bold mb-4">Kết thúc!</h2>
               <p className="text-xl font-semibold text-green-600">Điểm của bạn: {score}</p>
               <button
                 onClick={handleRetryQuiz}

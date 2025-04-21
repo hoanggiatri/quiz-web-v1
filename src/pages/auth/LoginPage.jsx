@@ -1,42 +1,58 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { users } from '../../mock/users';
+import axios from 'axios';
+import { useAuth } from '../../context/AuthContext';
 
 const LoginPage = () => {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const { login } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    const foundUser = users.find(
-      (u) => u.username === username && u.password === password
-    );
+    setError('');
 
-    if (foundUser) {
-      if (foundUser.role === 'student') navigate('/student');
-      else if (foundUser.role === 'teacher') navigate('/teacher');
-    } else {
-      setError('Tài khoản hoặc mật khẩu không đúng!');
+    try {
+      const res = await axios.post('http://localhost:8080/auth/login', {
+        email,
+        password
+      });
+
+      const userData = res.data.data; // userId, username, role, token...
+      login(userData); // lưu vào AuthContext và localStorage
+
+      switch (userData.role) {
+        case 'STUDENT':
+          navigate('/student');
+          break;
+        case 'TEACHER':
+          navigate('/teacher');
+          break;
+        case 'ADMIN':
+          navigate('/admin');
+          break;
+        default:
+          navigate('/unauthorized');
+      }
+    } catch (err) {
+      console.error(err);
+      setError('Email hoặc mật khẩu không đúng!');
     }
   };
 
   return (
-    <div className="min-h-screen flex flex-col justify-center items-center bg-gray-100">
-      <form 
-        onSubmit={handleLogin}
-        className="bg-white p-8 rounded-xl shadow-md w-80"
-      >
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <form onSubmit={handleLogin} className="bg-white p-8 rounded shadow-md w-80">
         <h2 className="text-2xl font-bold mb-6 text-center">Đăng nhập</h2>
 
         <input
-          type="text"
-          placeholder="Tên đăng nhập"
+          type="email"
+          placeholder="Email"
           className="border p-2 mb-4 w-full rounded"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
         />
 
         <input
@@ -47,11 +63,11 @@ const LoginPage = () => {
           onChange={(e) => setPassword(e.target.value)}
         />
 
-        {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
+        {error && <p className="text-red-500 mb-4 text-sm">{error}</p>}
 
         <button
           type="submit"
-          className="bg-blue-600 hover:bg-blue-700 text-white w-full py-2 rounded"
+          className="bg-blue-600 text-white w-full py-2 rounded hover:bg-blue-700"
         >
           Đăng nhập
         </button>
