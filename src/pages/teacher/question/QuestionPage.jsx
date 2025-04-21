@@ -1,4 +1,3 @@
-// pages/teacher/question/QuestionPage.jsx
 import React, { useEffect, useState } from "react";
 import QuestionTable from "../../../components/teacher/question/QuestionTable";
 import QuestionFormModal from "../../../components/teacher/question/QuestionFormModal";
@@ -11,18 +10,21 @@ const QuestionPage = () => {
   const [questions, setQuestions] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState("");
+  const [csvFile, setCsvFile] = useState(null);
+  const [importStatus, setImportStatus] = useState("");
+
   const { auth } = useAuth();
   const token = auth?.token;
+  const username = auth?.username;
 
+  // Fetch categories
   useEffect(() => {
     const fetchCategories = async () => {
       try {
         const res = await axios.get(
           "http://localhost:8080/student/get-all-question-category",
           {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
+            headers: { Authorization: `Bearer ${token}` },
           }
         );
         setCategories(res.data.data);
@@ -31,38 +33,84 @@ const QuestionPage = () => {
       }
     };
 
-    fetchCategories();
+    if (token) {
+      fetchCategories();
+    }
   }, [token]);
 
+  // Fetch questions
   useEffect(() => {
-    // Lấy câu hỏi nếu đã chọn category
-    if (selectedCategoryId) {
-      axios
-        .get(
-          `http://localhost:8080/teacher/get-all-question-by-category/${selectedCategoryId}?questionCategoryId=${selectedCategoryId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        )
-        .then((res) => setQuestions(res.data.data))
-        .catch((err) => console.error("Lỗi khi lấy câu hỏi:", err));
-    }
+    const fetchQuestions = async () => {
+      if (selectedCategoryId) {
+        try {
+          const res = await axios.get(
+            `http://localhost:8080/teacher/get-all-question-by-category/${selectedCategoryId}?questionCategoryId=${selectedCategoryId}`,
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          );
+          setQuestions(res.data.data);
+        } catch (err) {
+          console.error("Lỗi khi lấy câu hỏi:", err);
+        }
+      }
+    };
+
+    fetchQuestions();
   }, [token, selectedCategoryId]);
 
-  const handleAddCategory = () => {
+  const handleAddCategory = async () => {
     if (!newCategoryName.trim()) return;
 
-    axios
-      .post("http://localhost:8080/teacher/create-question-category", {
-        name: newCategoryName,
-      })
-      .then((res) => {
-        setCategories((prev) => [...prev, res.data]);
-        setNewCategoryName("");
-      })
-      .catch((err) => console.error("Lỗi khi thêm category:", err));
+    try {
+      const res = await axios.post(
+        "http://localhost:8080/teacher/create-question-category",
+        { name: newCategoryName },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      setCategories((prev) => [...prev, res.data]);
+      setNewCategoryName("");
+    } catch (err) {
+      console.error("Lỗi khi thêm category:", err);
+    }
+  };
+
+  const handleImportCSV = async () => {
+    if (!csvFile || !selectedCategoryId || !username) {
+      setImportStatus("⚠️ Vui lòng chọn file CSV, chủ đề và đăng nhập.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", csvFile);
+
+    try {
+      await axios.post(
+        `http://localhost:8080/teacher/import-question?questionCategoryId=${selectedCategoryId}&username=${username}`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setImportStatus("✅ Nhập câu hỏi thành công!");
+
+      // Reload questions
+      const res = await axios.get(
+        `http://localhost:8080/teacher/get-all-question-by-category/${selectedCategoryId}?questionCategoryId=${selectedCategoryId}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      setQuestions(res.data.data);
+    } catch (err) {
+      console.error("❌ Lỗi khi import CSV:", err);
+      setImportStatus("❌ Lỗi khi tải file. Kiểm tra lại định dạng CSV.");
+    }
   };
 
   return (
@@ -103,12 +151,34 @@ const QuestionPage = () => {
 
       {selectedCategoryId ? (
         <>
-          <button
-            onClick={() => setShowModal(true)}
-            className="mb-2 bg-green-600 text-white px-3 py-1 rounded"
-          >
-            Thêm câu hỏi
-          </button>
+          <div className="mb-3 flex gap-3">
+            <button
+              onClick={() => setShowModal(true)}
+              className="bg-green-600 text-white px-3 py-1 rounded"
+            >
+              Thêm câu hỏi
+            </button>
+
+            <div className="flex items-center gap-2">
+              <input
+                type="file"
+                accept=".csv"
+                onChange={(e) => setCsvFile(e.target.files[0])}
+                className="border p-1 rounded"
+              />
+              <button
+                onClick={handleImportCSV}
+                className="bg-purple-600 text-white px-3 py-1 rounded"
+              >
+                Nhập từ CSV
+              </button>
+            </div>
+          </div>
+
+          {importStatus && (
+            <p className="mb-3 text-sm italic text-gray-700">{importStatus}</p>
+          )}
+
           <QuestionTable questions={questions} />
         </>
       ) : (

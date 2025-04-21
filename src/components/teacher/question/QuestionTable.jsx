@@ -18,7 +18,7 @@ function QuestionTable({ questions, onEdit, onDelete, onAddAnswer }) {
             <td className="border p-2">{index + 1}</td>
             <td className="border p-2">{question.content}</td>
             <td className="border p-2">{question.type}</td>
-            <td className="border p-2">{question.difficulty}</td>
+            <td className="border p-2">{question.difficultyLevel}</td>
             <td className="border p-2">
               <button onClick={() => onEdit(question)}>Sửa</button>
               <button onClick={() => onDelete(question.id)}>Xoá</button>
