@@ -16,10 +16,10 @@ const TeacherDashboard = () => {
           ✏️ Quản lí câu hỏi
         </button>
         <button
-          onClick={() => navigate('/create-exam')}
+          onClick={() => navigate('/manage-exam')} 
           className="bg-purple-500 text-white px-4 py-2 rounded w-full"
         >
-          📝 Tạo Đề Thi
+          📝 Quản lí bài thi 
         </button>
         <button
           onClick={() => navigate('/exam-qr')}

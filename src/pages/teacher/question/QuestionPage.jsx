@@ -17,15 +17,12 @@ const QuestionPage = () => {
   const token = auth?.token;
   const username = auth?.username;
 
-  // Fetch categories
   useEffect(() => {
     const fetchCategories = async () => {
       try {
         const res = await axios.get(
           "http://localhost:8080/student/get-all-question-category",
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
+          { headers: { Authorization: `Bearer ${token}` } }
         );
         setCategories(res.data.data);
       } catch (err) {
@@ -38,16 +35,13 @@ const QuestionPage = () => {
     }
   }, [token]);
 
-  // Fetch questions
   useEffect(() => {
     const fetchQuestions = async () => {
       if (selectedCategoryId) {
         try {
           const res = await axios.get(
             `http://localhost:8080/teacher/get-all-question-by-category/${selectedCategoryId}?questionCategoryId=${selectedCategoryId}`,
-            {
-              headers: { Authorization: `Bearer ${token}` },
-            }
+            { headers: { Authorization: `Bearer ${token}` } }
           );
           setQuestions(res.data.data);
         } catch (err) {
@@ -66,9 +60,7 @@ const QuestionPage = () => {
       const res = await axios.post(
         "http://localhost:8080/teacher/create-question-category",
         { name: newCategoryName },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
       setCategories((prev) => [...prev, res.data]);
       setNewCategoryName("");
@@ -99,12 +91,9 @@ const QuestionPage = () => {
       );
       setImportStatus("✅ Nhập câu hỏi thành công!");
 
-      // Reload questions
       const res = await axios.get(
         `http://localhost:8080/teacher/get-all-question-by-category/${selectedCategoryId}?questionCategoryId=${selectedCategoryId}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
       setQuestions(res.data.data);
     } catch (err) {
@@ -114,75 +103,90 @@ const QuestionPage = () => {
   };
 
   return (
-    <div className="p-4">
-      <h2 className="text-xl font-bold mb-4">Quản lý câu hỏi</h2>
+    <div className="p-6 max-w-6xl mx-auto">
+      <h2 className="text-3xl font-bold mb-6 text-gray-800 flex items-center gap-2">
+        🎓 Quản lý câu hỏi
+      </h2>
 
-      <div className="mb-4">
-        <label className="mr-2">Chọn chủ đề:</label>
-        <select
-          value={selectedCategoryId || ""}
-          onChange={(e) => setSelectedCategoryId(e.target.value)}
-          className="border p-1 rounded"
-        >
-          <option value="">-- Chọn chủ đề --</option>
-          {categories.map((cat) => (
-            <option key={cat.questionCategoryId} value={cat.questionCategoryId}>
-              {cat.name}
-            </option>
-          ))}
-        </select>
+      {/* Chủ đề */}
+      <div className="bg-white shadow-md rounded-xl p-6 mb-6 space-y-6">
+        <div className="flex flex-col lg:flex-row lg:items-center gap-4">
+          <label className="font-medium text-gray-700 whitespace-nowrap">
+            Chọn chủ đề:
+          </label>
+          <select
+            value={selectedCategoryId || ""}
+            onChange={(e) => setSelectedCategoryId(e.target.value)}
+            className="border border-gray-300 rounded-lg px-3 py-2 w-full lg:w-64"
+          >
+            <option value="">-- Chọn chủ đề --</option>
+            {categories.map((cat) => (
+              <option
+                key={cat.questionCategoryId}
+                value={cat.questionCategoryId}
+              >
+                {cat.name}
+              </option>
+            ))}
+          </select>
 
-        <div className="mt-2 flex items-center gap-2">
           <input
             type="text"
             placeholder="Tên chủ đề mới"
             value={newCategoryName}
             onChange={(e) => setNewCategoryName(e.target.value)}
-            className="border p-1 rounded"
+            className="border border-gray-300 rounded-lg px-3 py-2 w-full lg:w-80"
           />
           <button
             onClick={handleAddCategory}
-            className="bg-blue-500 text-white px-2 py-1 rounded"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg font-semibold transition"
           >
-            Thêm chủ đề
+            ➕ Thêm chủ đề
           </button>
         </div>
       </div>
 
+      {/* Thao tác nếu đã chọn chủ đề */}
       {selectedCategoryId ? (
         <>
-          <div className="mb-3 flex gap-3">
-            <button
-              onClick={() => setShowModal(true)}
-              className="bg-green-600 text-white px-3 py-1 rounded"
-            >
-              Thêm câu hỏi
-            </button>
-
-            <div className="flex items-center gap-2">
+          <div className="mb-6 flex flex-col lg:flex-row lg:items-center gap-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full sm:w-auto">
               <input
                 type="file"
                 accept=".csv"
                 onChange={(e) => setCsvFile(e.target.files[0])}
-                className="border p-1 rounded"
+                className="border border-gray-300 px-3 py-2 rounded-lg w-full sm:w-auto"
               />
               <button
                 onClick={handleImportCSV}
-                className="bg-purple-600 text-white px-3 py-1 rounded"
+                className="bg-purple-600 hover:bg-purple-700 text-white px-5 py-2 rounded-lg font-semibold transition"
               >
-                Nhập từ CSV
+                📥 Nhập từ CSV
               </button>
             </div>
+            <button
+              onClick={() => setShowModal(true)}
+              className="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-lg font-semibold transition"
+            >
+              ➕ Thêm câu hỏi
+            </button>
           </div>
 
           {importStatus && (
-            <p className="mb-3 text-sm italic text-gray-700">{importStatus}</p>
+            <p className="mb-4 text-sm italic text-gray-700">{importStatus}</p>
           )}
 
-          <QuestionTable questions={questions} />
+          <QuestionTable
+            questions={questions}
+            onDeleteSuccess={(deletedId) => {
+              setQuestions((prev) => prev.filter((q) => q.id !== deletedId));
+            }}
+          />
         </>
       ) : (
-        <p className="text-gray-500">Vui lòng chọn chủ đề để xem câu hỏi.</p>
+        <p className="text-gray-500 italic text-center">
+          Vui lòng chọn chủ đề để xem hoặc thêm câu hỏi.
+        </p>
       )}
 
       <QuestionFormModal

@@ -4,6 +4,7 @@ import AdminDashboard from '../pages/admin/AdminDashboard';
 import QuizPage from '../pages/student/exam/QuizPage';
 import ExamQRPage from '../pages/teacher/create-exam/ExamQRPage';
 import QuestionPage from '../pages/teacher/question/QuestionPage';
+import ExamManagementPage from '../pages/teacher/exam/ExamManagementPage';
 
 export const studentRoutes = [
   { path: "/student", element: <StudentDashboard /> },
@@ -14,6 +15,7 @@ export const teacherRoutes = [
   { path: "/teacher", element: <TeacherDashboard /> },
   { path: "/exam-qr", element: <ExamQRPage /> },
   { path: "/question", element: <QuestionPage /> },
+  { path: "/manage-exam", element: <ExamManagementPage /> },
 ];
 
 export const adminRoutes = [
