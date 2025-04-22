@@ -5,6 +5,9 @@ import QuizPage from '../pages/student/exam/QuizPage';
 import ExamQRPage from '../pages/teacher/create-exam/ExamQRPage';
 import QuestionPage from '../pages/teacher/question/QuestionPage';
 import ExamManagementPage from '../pages/teacher/exam/ExamManagementPage';
+import CreateExamPage from '../pages/teacher/exam/CreateExamPage'; // Import mới
+import SelectQuestionPage from '../pages/teacher/exam/SelectQuestionPage'; // Import mới
+
 
 export const studentRoutes = [
   { path: "/student", element: <StudentDashboard /> },
@@ -16,6 +19,8 @@ export const teacherRoutes = [
   { path: "/exam-qr", element: <ExamQRPage /> },
   { path: "/question", element: <QuestionPage /> },
   { path: "/manage-exam", element: <ExamManagementPage /> },
+  { path: "/create-exam", element: <CreateExamPage /> },
+  { path: "/select-question-for-exam", element: <SelectQuestionPage /> },
 ];
 
 export const adminRoutes = [
